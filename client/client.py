@@ -2,50 +2,26 @@
 import asyncio
 import aiohttp
 import logging
+import aiohttp
+from typing import Optional
 from datetime import datetime
+import redis
+import json
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("ClientComputer")
 
 class ClientComputer:
-    def __init__(self):
-        self.logger = logging.getLogger("ClientComputer")
+    def __init__(self, modem_id: str, redis_host="localhost"):
+        self.modem_id = modem_id
+        self.redis = redis.Redis(host=redis_host, decode_responses=True)
+        self.pubsub = self.redis.pubsub()
         self.running = False
         
-    async def telemetry_listener(self):
-        """Listen to TM stream"""
-        while self.running:
-            try:
-                reader, writer = await asyncio.open_connection(
-                    'localhost', 8001)
-                self.logger.info("Connected to TM stream")
-                
-                while self.running:
-                    data = await reader.read(1024)
-                    if not data:
-                        break
-                    self.logger.info(f"Received TM: {data.hex()}")
-                    
-            except ConnectionError:
-                self.logger.warning("TM Connection Error")
-                await asyncio.sleep(1)
-                
-    async def send_telecommand(self, command):
-        """Send a TC to modem"""
-        try:
-            reader, writer = await asyncio.open_connection(
-                'localhost', 8002)
-                
-            writer.write(command)
-            await writer.drain()
-            
-            # Wait for ACK
-            ack = await reader.read(1024)
-            if ack:
-                self.logger.info(f"Received ACK: {ack.hex()}")
-                
-            writer.close()
-            await writer.wait_closed()
-            
-        except ConnectionError as e:
-            self.logger.error(f"Failed to send TC: {e}")
+    async def send_telecommand(self, data: bytes):
+        """Send telecommand to modem via pipeline"""
+        self.redis.publish(f"modem:{self.modem_id}:telecommand", data.hex())
+        logger.info(f"Sent telecommand: {data.hex()}")
             
     async def monitor_metrics(self, interval=5):
         """Periodically fetch and log metrics"""
@@ -70,12 +46,27 @@ class ClientComputer:
                 await asyncio.sleep(interval)
                 
     async def run(self):
-        """Run all client functions"""
+        """Start the client"""
         self.running = True
-        await asyncio.gather(
-            self.telemetry_listener(),
-            self.monitor_metrics()
-        )
+        self.pubsub_thread = self.pubsub.run_in_thread(sleep_time=0.001)
+        await asyncio.sleep(2)
+        await self.send_telecommand(b"TEST_COMMAND")
+        await asyncio.sleep(1)
+        await self.get_metrics("signal_strength")
+        
+    async def stop(self):
+        """Stop the client"""
+        self.running = False
+        self.pubsub_thread.stop()
+
+async def main():
+    client = ClientComputer("modem1")
+    try:
+        await client.run()
+        while client.running:
+            await asyncio.sleep(1)
+    except KeyboardInterrupt:
+        await client.stop()
 
 if __name__ == "__main__":
     logging.basicConfig(
