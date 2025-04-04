@@ -23,5 +23,17 @@ Modules:
 
 Modules:
 
-- **Telemetry Server**: Receive telemetries using redis connection
-- **Telecommands Server**: Send telecommands using redis connection
+- **Telemetry Server**: Receive telemetries using port 8001 (implement redis connection for efficiency)
+- **Telecommands Server**: Send telecommands using port 8002 (implement redis connection for efficiency)
+
+### Deployment
+
+Deploy client and modem services
+
+`docker-compose up --build`
+
+### Test/Validation
+
+Deploy your app and execute this script:
+
+`python scripts/test_stack.py`
