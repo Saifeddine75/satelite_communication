@@ -4,8 +4,11 @@ __pycache__/
 # Environment
 .env
 .venv/
+build/
+var/
 
 # IDE
 .vscode/
 .idea/
 .TODO
+.qodo
