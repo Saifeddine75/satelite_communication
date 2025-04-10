@@ -107,7 +107,7 @@ test:
 .PHONY: validate-stack
 validate-stack:
 	docker compose up --build -d
-	python scripts/test_stack.py
+	python scripts/validate_stack.py
 
 # ----------------------------------
 # Docker
