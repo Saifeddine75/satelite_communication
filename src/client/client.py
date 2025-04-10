@@ -2,7 +2,6 @@
 import asyncio
 import aiohttp
 import logging
-from datetime import datetime
 
 class ClientComputer:
     def __init__(self):

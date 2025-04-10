@@ -92,6 +92,9 @@ check-all: check-black check-lint check-isort check-typing
 	check-bandit
 	echo "Quality checks passed!"
 
+fix-lint:
+	ruff check $(APP_DIR) $(APP_TEST_DIR) --fix 
+
 # ----------------------------------
 # Test & Validation
 # ----------------------------------

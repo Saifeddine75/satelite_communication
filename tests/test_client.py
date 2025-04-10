@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 from src.client.client import ClientComputer
 
 @pytest.mark.asyncio
