@@ -1,4 +1,5 @@
 import pytest
+import os
 import asyncio
 import aiohttp
 import logging
@@ -117,7 +118,8 @@ async def main():
 
 if __name__ == "__main__":
     # Windows-specific event loop policy
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    if os.name == "nt":
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
     
     try:
         asyncio.run(main())
