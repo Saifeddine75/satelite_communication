@@ -1,4 +1,4 @@
-name: Install Dependencies
+name: CI Dependencies validation
 
 on:
   push:
