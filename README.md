@@ -10,6 +10,12 @@ A Python-based simulation of ground station communication with satellite systems
 
 ## 🧠 System Architecture
 
+## Dependencies:
+
+- python-uv==0.6.10
+
+## System Architecture
+
 ![alt text](image.png)
 
 ### 🛰️ Modem
