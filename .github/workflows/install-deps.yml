@@ -1,0 +1,26 @@
+name: CI Dependencies validation
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  install-deps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: |
+          echo "Installing dependencies..."
+          python --version
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
